@@ -1,5 +1,4 @@
-#BINARIES = boomkat boomkat.arm
-BINARIES = boomkat
+BINARIES = boomkat boomkat.arm
 BLDDIR = build
 SRCDIR = .
 
