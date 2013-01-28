@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./boomkat"
 	"fmt"
+	"github.com/koyachi/go-boomkat/boomkat"
 	"log"
 )
 
