@@ -54,13 +54,19 @@ func downloadRecord(recordId string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	done := make(chan bool)
+	sem := make(chan int, 2)
 	for _, track := range tracks {
-		fmt.Printf("track_id:%s start...", track.Id())
-		err = track.Download()
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("done.\n")
+		go func(track *boomkat.Track) {
+			sem <- 1
+			downloadTrackTask(track)
+			<-sem
+			done <- true
+		}(track)
+	}
+	for i := 0; i < len(tracks); i++ {
+		<-done
+		fmt.Printf("[%d:done]\n", i)
 	}
 }
 
@@ -72,15 +78,19 @@ func downloadTrack(recordId, trackId string) {
 	}
 	for _, track := range tracks {
 		if track.Id() == trackId {
-			fmt.Printf("track_id:%s start...", track.Id())
-			err = track.Download()
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Printf("done.\n")
+			downloadTrackTask(track)
 			break
 		}
 	}
+}
+
+func downloadTrackTask(track *boomkat.Track) {
+	fmt.Printf("track_id:%s start...", track.Id())
+	err := track.Download()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("done.\n")
 }
 
 func tracksFromRecordId(recordId string) ([]*boomkat.Track, error) {
