@@ -49,6 +49,7 @@ func search(word string) {
 }
 
 func downloadRecord(recordId string) {
+	fmt.Printf("downloat record[record_id=%s]\n", recordId)
 	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)
@@ -64,6 +65,7 @@ func downloadRecord(recordId string) {
 }
 
 func downloadTrack(recordId, trackId string) {
+	fmt.Printf("downloat track[record_id=%s, track_id=%s]\n", recordId, trackId)
 	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)

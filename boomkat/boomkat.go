@@ -8,6 +8,18 @@ import (
 )
 
 var reId = regexp.MustCompile(`^.*?(\d+)`)
+var boomkatDir string = ""
+
+func BoomkatDir() string {
+	if boomkatDir != "" {
+		return boomkatDir
+	}
+	return "/tmp/boomkat"
+}
+
+func SetBoomkatDir(dir string) {
+	boomkatDir = dir
+}
 
 func Search(word string) ([]*Record, error) {
 	var doc *goquery.Document
@@ -55,8 +67,4 @@ func Search(word string) ([]*Record, error) {
 	})
 
 	return records, nil
-}
-
-func BoomkatDir() string {
-	return "/tmp/boomkat"
 }
