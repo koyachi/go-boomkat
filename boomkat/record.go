@@ -3,6 +3,7 @@ package boomkat
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,6 +21,29 @@ type Record struct {
 	Review    string
 	PageUrl   string
 	tracks    []*Track
+}
+
+func NewRecordFromId(id string) (*Record, error) {
+	var doc *goquery.Document
+	var e error
+
+	recordUrl := fmt.Sprintf("http://boomkat.com/downloads/%s", id)
+	if doc, e = goquery.NewDocument(recordUrl); e != nil {
+		return nil, e
+	}
+
+	record := &Record{
+		Id:     id,
+		Artist: doc.Find("h1.product-header-artist-value").Text(),
+		Title:  doc.Find("h1.product-header-title").Text(),
+		Label:  doc.Find("div#product-header-label").Text(),
+		Genre:  GenresFromString(doc.Find("div#product-header-genre a").Text()),
+		//Thumbnail
+		Review:  doc.Find("div#product-description-text").Text(),
+		PageUrl: recordUrl, // ???
+	}
+
+	return record, nil
 }
 
 func (r *Record) Url() string {

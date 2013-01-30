@@ -8,6 +8,7 @@ import (
 )
 
 var reFilename = regexp.MustCompile(`^.*?(\d+.mp3)`)
+var reFileId = regexp.MustCompile(`^.*?(\d+).mp3`)
 
 type Track struct {
 	ProductId int64  `json:"product_id"`
@@ -34,6 +35,16 @@ func (t *Track) filename() string {
 	}
 
 	// TODO: 適当にユニーク文字列生成 prefix + time
+	return ""
+}
+
+func (t *Track) Id() string {
+	matchs := reFileId.FindStringSubmatch(t.SampleMp3)
+	if len(matchs) > 1 {
+		return matchs[1]
+	}
+
+	// TODO:
 	return ""
 }
 

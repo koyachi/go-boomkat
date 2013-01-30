@@ -5,7 +5,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"net/url"
 	"regexp"
-	"strings"
 )
 
 var reId = regexp.MustCompile(`^.*?(\d+)`)
@@ -24,7 +23,7 @@ func Search(word string) ([]*Record, error) {
 	elmRecords := doc.Find(".line")
 	records := make([]*Record, elmRecords.Length())
 	elmRecords.Each(func(i int, s *goquery.Selection) {
-		var artist, title, label, genre, review string
+		var artist, title, label, review string
 		var recordUrl string
 
 		meta := s.Find(".meta")
@@ -40,11 +39,7 @@ func Search(word string) ([]*Record, error) {
 		title = meta.Find("p:nth-of-type(1)").Text()
 		label = meta.Find("p:nth-of-type(2)").Text()
 		// TODO: format
-		genre = meta.Find("p:nth-of-type(4)").Text()
-		genres := strings.Split(genre, "/")
-		for i, genre := range genres {
-			genres[i] = strings.TrimSpace(genre)
-		}
+		genres := GenresFromString(meta.Find("p:nth-of-type(4)").Text())
 		review = s.Find("div.review").Text()
 
 		records[i] = &Record{

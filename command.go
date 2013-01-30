@@ -51,5 +51,24 @@ func search(word string) {
 func downloadRecord() {
 }
 
-func downloadTrack() {
+func downloadTrack(recordId, trackId string) {
+	record, err := boomkat.NewRecordFromId(recordId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	tracks, err := record.SampleTracks()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, track := range tracks {
+		if track.Id() == trackId {
+			fmt.Printf("start download.")
+			err = track.Download()
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Printf("done.")
+			break
+		}
+	}
 }

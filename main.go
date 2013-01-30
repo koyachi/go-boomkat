@@ -23,6 +23,7 @@ func main() {
 		search(flag.Arg(1))
 		return
 	case "download":
+		downloadTrack(flag.Arg(1), flag.Arg(2))
 		return
 	}
 }
