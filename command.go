@@ -48,15 +48,23 @@ func search(word string) {
 	}
 }
 
-func downloadRecord() {
-}
-
-func downloadTrack(recordId, trackId string) {
-	record, err := boomkat.NewRecordFromId(recordId)
+func downloadRecord(recordId string) {
+	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)
 	}
-	tracks, err := record.SampleTracks()
+	for _, track := range tracks {
+		fmt.Printf("start download.")
+		err = track.Download()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("done.")
+	}
+}
+
+func downloadTrack(recordId, trackId string) {
+	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -71,4 +79,16 @@ func downloadTrack(recordId, trackId string) {
 			break
 		}
 	}
+}
+
+func tracksFromRecordId(recordId string) ([]*boomkat.Track, error) {
+	record, err := boomkat.NewRecordFromId(recordId)
+	if err != nil {
+		return nil, err
+	}
+	tracks, err := record.SampleTracks()
+	if err != nil {
+		return nil, err
+	}
+	return tracks, nil
 }
