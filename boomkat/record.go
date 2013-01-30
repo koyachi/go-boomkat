@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -79,9 +78,8 @@ func (r *Record) SampleTracks() ([]*Track, error) {
 	}
 
 	r.tracks = sampleTrackResponse.Tracks
-	for i, track := range r.tracks {
+	for _, track := range r.tracks {
 		track.SetRecord(*r)
-		log.Printf("  [%d] track.SetRecord()", i)
 	}
 	return r.tracks, nil
 }

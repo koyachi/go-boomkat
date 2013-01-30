@@ -49,35 +49,35 @@ func search(word string) {
 }
 
 func downloadRecord(recordId string) {
-	fmt.Printf("downloat record[record_id=%s]\n", recordId)
+	fmt.Printf("downloat record[record_id:%s]\n", recordId)
 	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, track := range tracks {
-		fmt.Printf("start download.")
+		fmt.Printf("track_id:%s start...", track.Id())
 		err = track.Download()
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("done.")
+		fmt.Printf("done.\n")
 	}
 }
 
 func downloadTrack(recordId, trackId string) {
-	fmt.Printf("downloat track[record_id=%s, track_id=%s]\n", recordId, trackId)
+	fmt.Printf("downloat track[record_id:%s, track_id:%s]\n", recordId, trackId)
 	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, track := range tracks {
 		if track.Id() == trackId {
-			fmt.Printf("start download.")
+			fmt.Printf("track_id:%s start...", track.Id())
 			err = track.Download()
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("done.")
+			fmt.Printf("done.\n")
 			break
 		}
 	}
