@@ -92,7 +92,7 @@ func downloadTrack(recordId, trackId string) {
 }
 
 func downloadTrackTask(track *boomkat.Track) {
-	tag := fmt.Sprintf("TASK:DLTRACK:%s", track.Id())
+	tag := fmt.Sprintf("TSK:DLTRACK:%s", track.Id())
 	fmt.Printf("%s:START\n", tag)
 	err := track.Download()
 	if err != nil {
