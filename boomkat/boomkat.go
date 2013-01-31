@@ -27,7 +27,6 @@ func Search(word string) ([]*Record, error) {
 
 	// TODO: urlEncode "word"
 	searchUrl := fmt.Sprintf("http://boomkat.com/search?q=%s", url.QueryEscape(word))
-	fmt.Printf("searchUrl = %s\n", searchUrl)
 	if doc, e = goquery.NewDocument(searchUrl); e != nil {
 		return nil, e
 	}
@@ -47,7 +46,6 @@ func Search(word string) ([]*Record, error) {
 		if reId.MatchString(recordUrl) {
 			recordId = reId.FindStringSubmatch(recordUrl)[1]
 		}
-		fmt.Printf("recordId = %s\n", recordId)
 		title = meta.Find("p:nth-of-type(1)").Text()
 		label = meta.Find("p:nth-of-type(2)").Text()
 		// TODO: format

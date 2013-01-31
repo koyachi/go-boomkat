@@ -36,42 +36,48 @@ func _searchTest(word string) {
 }
 
 func search(word string) {
+	tag := fmt.Sprintf("CMD:SEARCH:%s", word)
+	fmt.Printf("%s:START\n", tag)
 	var err error
 
 	records, err := boomkat.Search(word)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, record := range records {
-		fmt.Printf("[%s] artist = %s, title = %s, label = %s, genre = %s, url = %s\n",
-			record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url())
+	for i, record := range records {
+		fmt.Printf("%s:RES:[%s] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s}\n",
+			tag, i, record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url())
 	}
+	fmt.Printf("%s:END\n", tag)
 }
 
 func downloadRecord(recordId string) {
-	fmt.Printf("downloat record[record_id:%s]\n", recordId)
+	tag := fmt.Sprintf("CMD:DownloadRecord:%s", recordId)
+	fmt.Printf("%s:START\n", tag)
 	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)
 	}
-	done := make(chan bool)
+	done := make(chan string)
 	sem := make(chan int, 2)
 	for _, track := range tracks {
 		go func(track *boomkat.Track) {
 			sem <- 1
 			downloadTrackTask(track)
 			<-sem
-			done <- true
+			done <- track.Id()
 		}(track)
 	}
 	for i := 0; i < len(tracks); i++ {
-		<-done
-		fmt.Printf("[%d:done]\n", i)
+		trackId := <-done
+		fmt.Printf("%s:%s:DONE\n", tag, trackId)
 	}
+	fmt.Printf("%s:END\n", tag)
 }
 
 func downloadTrack(recordId, trackId string) {
-	fmt.Printf("downloat track[record_id:%s, track_id:%s]\n", recordId, trackId)
+	tag := fmt.Sprintf("CMD:DownloadTrack:%s:%s", recordId, trackId)
+	fmt.Printf("%s:START\n", tag)
 	tracks, err := tracksFromRecordId(recordId)
 	if err != nil {
 		log.Fatal(err)
@@ -82,15 +88,17 @@ func downloadTrack(recordId, trackId string) {
 			break
 		}
 	}
+	fmt.Printf("%s:END\n", tag)
 }
 
 func downloadTrackTask(track *boomkat.Track) {
-	fmt.Printf("track_id:%s start...", track.Id())
+	tag := fmt.Sprintf("TASK:DLTRACK:%s", track.Id())
+	fmt.Printf("%s:START\n", tag)
 	err := track.Download()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("done.\n")
+	fmt.Printf("%s:END\n", tag)
 }
 
 func tracksFromRecordId(recordId string) ([]*boomkat.Track, error) {
