@@ -45,7 +45,7 @@ func search(word string) {
 		log.Fatal(err)
 	}
 	for i, record := range records {
-		fmt.Printf("%s:RES:[%s] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s}\n",
+		fmt.Printf("%s:RES:[%d] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s}\n",
 			tag, i, record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url())
 	}
 	fmt.Printf("%s:END\n", tag)
@@ -111,4 +111,41 @@ func tracksFromRecordId(recordId string) ([]*boomkat.Track, error) {
 		return nil, err
 	}
 	return tracks, nil
+}
+
+func dumpRecords(records []*boomkat.Record, commandTag, typeTag string) {
+	for i, record := range records {
+		fmt.Printf("%s:%s:[%d] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s}\n",
+			commandTag, typeTag, i, record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url())
+	}
+}
+
+func recordInfo(recordId string) {
+	tag := fmt.Sprintf("CMD:RecordInfo:%s", recordId)
+	fmt.Printf("%s:START\n", tag)
+	record, err := boomkat.NewRecordFromId(recordId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	recordsAlsoBought, err := record.RecordsAlsoBought()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dumpRecords(recordsAlsoBought, tag, "ALSO_BOUGHT")
+	recordsByTheSameArtist, err := record.RecordsByTheSameArtist()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dumpRecords(recordsByTheSameArtist, tag, "BY_THE_SAME_ARTIST")
+	recordsByTheSameLabel, err := record.RecordsByTheSameLabel()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dumpRecords(recordsByTheSameLabel, tag, "BY_THE_SAME_LABEL")
+	recordsYouMightLike, err := record.RecordsYouMightLike()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dumpRecords(recordsYouMightLike, tag, "YOU_MIGHT_LIKE")
+	fmt.Printf("%s:END\n", tag)
 }

@@ -90,6 +90,53 @@ func (r *Record) DownloadSampleTracks() {
 	}
 }
 
+func (r *Record) moreRecords(cssQuery string) ([]*Record, error) {
+	var doc *goquery.Document
+	var e error
+	if doc, e = goquery.NewDocument(r.PageUrl); e != nil {
+		return nil, e
+	}
+
+	elmRecords := doc.Find(cssQuery)
+	records := make([]*Record, elmRecords.Length())
+	elmRecords.Each(func(i int, s *goquery.Selection) {
+		artist := s.Find("p.artist").Text()
+		title := s.Find("p.title").Text()
+		label := s.Find("p.lebel").Text()
+		var recordUrl, recordId string
+		if val, ok := s.Find("p.artist a").Attr("href"); ok {
+			recordUrl = val
+		}
+		if reId.MatchString(recordUrl) {
+			recordId = reId.FindStringSubmatch(recordUrl)[1]
+		}
+		records[i] = &Record{
+			Id:      recordId,
+			Artist:  artist,
+			Title:   title,
+			Label:   label,
+			PageUrl: recordUrl,
+		}
+	})
+	return records, nil
+}
+
+func (r *Record) RecordsAlsoBought() ([]*Record, error) {
+	return r.moreRecords("div#slider-group-cross-sell div.data div.meta")
+}
+
+func (r *Record) RecordsByTheSameArtist() ([]*Record, error) {
+	return r.moreRecords("div#slider-group-same-artist div.data div.meta")
+}
+
+func (r *Record) RecordsByTheSameLabel() ([]*Record, error) {
+	return r.moreRecords("div#slider-group-same-label div.data div.meta")
+}
+
+func (r *Record) RecordsYouMightLike() ([]*Record, error) {
+	return r.moreRecords("div#slider-group-same-genre div.data div.meta")
+}
+
 func (r *Record) WorkDir() (string, error) {
 	var dirName = filepath.Join(BoomkatDir(), r.Id)
 	var f *os.File

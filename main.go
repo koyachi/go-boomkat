@@ -36,6 +36,9 @@ func main() {
 	case "search":
 		search(additionalArgs[1])
 		return
+	case "info":
+		recordInfo(additionalArgs[1])
+		return
 	case "download":
 		if *recordId == "" && len(additionalArgs) >= 2 {
 			*recordId = additionalArgs[1]
