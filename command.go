@@ -44,10 +44,7 @@ func search(word string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for i, record := range records {
-		fmt.Printf("%s:RES:[%d] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s}\n",
-			tag, i, record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url())
-	}
+	dumpRecords(records, tag, "RES")
 	fmt.Printf("%s:END\n", tag)
 }
 
