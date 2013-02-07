@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/koyachi/go-boomkat/boomkat"
 	"log"
+	"reflect"
 )
 
 func search(word string) {
@@ -103,39 +104,31 @@ func recordInfo(recordId string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	done := make(chan bool)
-	go func(record *boomkat.Record) {
-		recordsAlsoBought, err := record.RecordsAlsoBought()
-		if err != nil {
-			log.Fatal(err)
+	dumpMoreRecords := func(record *boomkat.Record, methodName, tag1, tag2 string) {
+		results := reflect.ValueOf(record).MethodByName(methodName).Call([]reflect.Value{})
+		records := (results[0].Interface()).([]*boomkat.Record)
+		e := results[1].Interface()
+		// nil guard before type assertion
+		if e != nil {
+			err := (e).(error)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
-		dumpRecords(recordsAlsoBought, tag, "ALSO_BOUGHT", true)
+		dumpRecords(records, tag1, tag2, true)
 		done <- true
-	}(record)
-	go func(record *boomkat.Record) {
-		recordsByTheSameArtist, err := record.RecordsByTheSameArtist()
-		if err != nil {
-			log.Fatal(err)
-		}
-		dumpRecords(recordsByTheSameArtist, tag, "BY_THE_SAME_ARTIST", true)
-		done <- true
-	}(record)
-	go func(record *boomkat.Record) {
-		recordsByTheSameLabel, err := record.RecordsByTheSameLabel()
-		if err != nil {
-			log.Fatal(err)
-		}
-		dumpRecords(recordsByTheSameLabel, tag, "BY_THE_SAME_LABEL", true)
-		done <- true
-	}(record)
-	go func(record *boomkat.Record) {
-		recordsYouMightLike, err := record.RecordsYouMightLike()
-		if err != nil {
-			log.Fatal(err)
-		}
-		dumpRecords(recordsYouMightLike, tag, "YOU_MIGHT_LIKE", true)
-		done <- true
-	}(record)
+	}
+	m := map[string]string{
+		"RecordsAlsoBought":      "ALSO_BOUGHT",
+		"RecordsByTheSameArtist": "BY_THE_SAME_ARTIST",
+		"RecordsByTheSameLabel":  "BY_THE_SAME_LABEL",
+		"RecordsYouMightLike":    "YOU_MIGHT_LIKE",
+	}
+	for k, v := range m {
+		go dumpMoreRecords(record, k, tag, v)
+	}
 	for i := 0; i < 4; i++ {
 		<-done
 	}
