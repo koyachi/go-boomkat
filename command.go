@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/koyachi/go-boomkat/boomkat"
+	//"github.com/ymotongpoo/goltsv"
+	"github.com/koyachi/goltsv"
 	"log"
 	"reflect"
 )
@@ -83,8 +86,45 @@ func tracksFromRecordId(recordId string) ([]*boomkat.Track, error) {
 }
 
 func dumpRecord(index int, commandTag, typeTag string, record *boomkat.Record) {
-	fmt.Printf("%s:%s:[%d] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s}\n",
-		commandTag, typeTag, index, record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url())
+	/*
+		 "github.com/ymotongpoo/goltsv"
+			data := []map[string]string{
+					{
+						"command": commandTag,
+						"type":    typeTag,
+						"index":   fmt.Sprintf("%v", index),
+						"id":      record.Id,
+						"artist":  record.Artist,
+						"title":   record.Title,
+						"label":   record.Label,
+						//"genre":   record.Genre, // TODO: to hierarchical or to decodable string
+						"url": record.Url(),
+					},
+			}
+	*/
+	data := map[string]string{
+		"command": commandTag,
+		"type":    typeTag,
+		"index":   fmt.Sprintf("%v", index),
+		"id":      record.Id,
+		"artist":  record.Artist,
+		"title":   record.Title,
+		"label":   record.Label,
+		//"genre":   record.Genre, // TODO: to hierarchical or to decodable string
+		"url": record.Url(),
+	}
+	b := &bytes.Buffer{}
+	writer := goltsv.NewWriter(b)
+	//err := writer.WriteAll(data)
+	err := writer.Write(data)
+	if err != nil {
+		panic(err)
+	}
+	err = writer.Flush()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%v", b.String())
 }
 
 func dumpRecords(records []*boomkat.Record, commandTag, typeTag string, doAsync bool) {
