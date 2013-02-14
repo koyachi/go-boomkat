@@ -3,6 +3,7 @@ package boomkat
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/koyachi/go-boomkat/goquerywrapper"
 	"net/url"
 	"regexp"
 )
@@ -27,7 +28,7 @@ func Search(word string) ([]*Record, error) {
 
 	// TODO: urlEncode "word"
 	searchUrl := fmt.Sprintf("http://boomkat.com/search?q=%s", url.QueryEscape(word))
-	if doc, e = goquery.NewDocument(searchUrl); e != nil {
+	if doc, e = goquerywrapper.NewDocument(searchUrl); e != nil {
 		return nil, e
 	}
 

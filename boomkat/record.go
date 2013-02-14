@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/koyachi/go-boomkat/goquerywrapper"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -27,7 +28,7 @@ func NewRecordFromId(id string) (*Record, error) {
 	var e error
 
 	recordUrl := fmt.Sprintf("http://boomkat.com/downloads/%s", id)
-	if doc, e = goquery.NewDocument(recordUrl); e != nil {
+	if doc, e = goquerywrapper.NewDocument(recordUrl); e != nil {
 		return nil, e
 	}
 
@@ -93,7 +94,7 @@ func (r *Record) DownloadSampleTracks() {
 func (r *Record) moreRecords(cssQuery string) ([]*Record, error) {
 	var doc *goquery.Document
 	var e error
-	if doc, e = goquery.NewDocument(r.PageUrl); e != nil {
+	if doc, e = goquerywrapper.NewDocument(r.PageUrl); e != nil {
 		return nil, e
 	}
 
