@@ -83,8 +83,8 @@ func tracksFromRecordId(recordId string) ([]*boomkat.Track, error) {
 }
 
 func dumpRecord(index int, commandTag, typeTag string, record *boomkat.Record) {
-	fmt.Printf("%s:%s:[%d] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s}\n",
-		commandTag, typeTag, index, record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url())
+	fmt.Printf("%s:%s:[%d] = {id = %s, artist = %s, title = %s, label = %s, genre = %s, url = %s, thumbnail = %s}\n",
+		commandTag, typeTag, index, record.Id, record.Artist, record.Title, record.Label, record.Genre, record.Url(), record.CoverUrl)
 }
 
 func dumpRecords(records []*boomkat.Record, commandTag, typeTag string, doAsync bool) {
@@ -104,6 +104,7 @@ func recordInfo(recordId string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	dumpRecord(0, tag, "RECORD_INFO", record)
 
 	done := make(chan bool)
 	dumpMoreRecords := func(record *boomkat.Record, methodName, tag1, tag2 string) {

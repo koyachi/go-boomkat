@@ -36,8 +36,11 @@ func Search(word string) ([]*Record, error) {
 	records := make([]*Record, elmRecords.Length())
 	elmRecords.Each(func(i int, s *goquery.Selection) {
 		var artist, title, label, review string
-		var recordUrl string
+		var recordUrl, coverUrl string
 
+		if val, ok := s.Find("div.image a img").Attr("src"); ok {
+			coverUrl = val
+		}
 		meta := s.Find(".meta")
 		artist = meta.Find("h4").Text()
 		if val, ok := meta.Find("h4 a").Attr("href"); ok {
@@ -60,8 +63,9 @@ func Search(word string) ([]*Record, error) {
 			Label:  label,
 			Genre:  genres,
 			// TODO: Thumbnail
-			Review:  review,
-			PageUrl: recordUrl,
+			Review:   review,
+			PageUrl:  recordUrl,
+			CoverUrl: coverUrl,
 		}
 	})
 

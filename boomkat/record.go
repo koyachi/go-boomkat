@@ -20,6 +20,7 @@ type Record struct {
 	Thumbnail string
 	Review    string
 	PageUrl   string
+	CoverUrl  string
 	tracks    []*Track
 }
 
@@ -32,6 +33,11 @@ func NewRecordFromId(id string) (*Record, error) {
 		return nil, e
 	}
 
+	var coverUrl string
+	if val, ok := doc.Find("div#main-image img").Attr("src"); ok {
+		coverUrl = val
+	}
+
 	record := &Record{
 		Id:     id,
 		Artist: doc.Find("h1.product-header-artist-value").Text(),
@@ -39,8 +45,9 @@ func NewRecordFromId(id string) (*Record, error) {
 		Label:  doc.Find("div#product-header-label").Text(),
 		Genre:  GenresFromString(doc.Find("div#product-header-genre a").Text()),
 		//Thumbnail
-		Review:  doc.Find("div#product-description-text").Text(),
-		PageUrl: recordUrl, // ???
+		Review:   doc.Find("div#product-description-text").Text(),
+		PageUrl:  recordUrl, // ???
+		CoverUrl: coverUrl,
 	}
 
 	return record, nil
