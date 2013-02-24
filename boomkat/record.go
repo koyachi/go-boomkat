@@ -105,12 +105,12 @@ func (r *Record) moreRecords(cssQuery string) ([]*Record, error) {
 		return nil, e
 	}
 
-	elmRecords := doc.Find(cssQuery)
+	elmRecords := doc.Find(fmt.Sprintf("%s div.data div.meta", cssQuery))
 	records := make([]*Record, elmRecords.Length())
 	elmRecords.Each(func(i int, s *goquery.Selection) {
 		artist := s.Find("p.artist").Text()
 		title := s.Find("p.title").Text()
-		label := s.Find("p.lebel").Text()
+		label := s.Find("p.label").Text()
 		var recordUrl, recordId string
 		if val, ok := s.Find("p.artist a").Attr("href"); ok {
 			recordUrl = val
@@ -126,23 +126,32 @@ func (r *Record) moreRecords(cssQuery string) ([]*Record, error) {
 			PageUrl: recordUrl,
 		}
 	})
+
+	elmRecords = doc.Find(fmt.Sprintf("%s div.image.medium a img", cssQuery))
+	elmRecords.Each(func(i int, s *goquery.Selection) {
+		var coverUrl string
+		if val, ok := s.Attr("src"); ok {
+			coverUrl = val
+		}
+		records[i].CoverUrl = coverUrl
+	})
 	return records, nil
 }
 
 func (r *Record) RecordsAlsoBought() ([]*Record, error) {
-	return r.moreRecords("div#slider-group-cross-sell div.data div.meta")
+	return r.moreRecords("div#slider-group-cross-sell")
 }
 
 func (r *Record) RecordsByTheSameArtist() ([]*Record, error) {
-	return r.moreRecords("div#slider-group-same-artist div.data div.meta")
+	return r.moreRecords("div#slider-group-same-artist")
 }
 
 func (r *Record) RecordsByTheSameLabel() ([]*Record, error) {
-	return r.moreRecords("div#slider-group-same-label div.data div.meta")
+	return r.moreRecords("div#slider-group-same-label")
 }
 
 func (r *Record) RecordsYouMightLike() ([]*Record, error) {
-	return r.moreRecords("div#slider-group-same-genre div.data div.meta")
+	return r.moreRecords("div#slider-group-same-genre")
 }
 
 func (r *Record) WorkDir() (string, error) {
